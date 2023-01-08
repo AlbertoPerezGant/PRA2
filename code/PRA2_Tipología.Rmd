@@ -1,0 +1,31 @@
+---
+title: "PRA-2"
+author: "Alberto Perez Gant y Patricia García Menendez"
+date: '`r format(Sys.Date(),"%e de %B, %Y")`'
+output:
+  pdf_document:
+    toc: yes
+    latex_engine: xelatex
+  html_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load_libraries, include=FALSE}
+if (!require("dplyr")) install.packages("dplyr")
+library("dplyr")
+if (!require("car")) install.packages("car"); library("car")
+if (!require("kableExtra")) install.packages("kableExtra")
+library("kableExtra")
+if (!require("knitr")) install.packages("knitr") 
+library("knitr")
+if (!require("lattice")) install.packages("lattice") 
+library("lattice")
+if (!require("caret")) install.packages("caret") 
+library("caret")
+```
+
+# 1 Descripción del dataset
