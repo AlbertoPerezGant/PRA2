@@ -39,7 +39,8 @@ df <- read.csv("../dataset/heart.csv", stringsAsFactors = TRUE)
 head(df)
 ```
 
-Una vez contamos con la variable que contiene los datos del ejercicio, se procede a su exploración. En primer lugar, aunque ya hemos realizado un head() del dataframe examinamos que tipo de datos contiene con str().
+Una vez se ha importado el dataset y almacenado en la variable que contiene los datos del ejercicio, se procede a su exploración. 
+En primer lugar, aunque se ha realizado una visualización de la cabecera del dataframe mediante el método **head()**, se examina que tipo de datos contiene con **str()**.
 
 ```{r}
 str(df)
@@ -106,20 +107,22 @@ Las variables encontradas son:
     -   1= Mas riesgo de sufrir un ataque cardiaco
 
 Como se puede observar, la mayoría de las variables son de tipo numérico, por lo que será necesario convertirlas a un tipo de dato acorde al objetivo de la misma.
+Se emplea ahora la función **summary()** para hacer un resumen estadísitico de las variables del dataset.
 
 ```{r}
 summary(df)
 ```
 
-Se observa como algunas de las variables arrojan unos estadísticos sin sentido como en el caso de la variable sexo o rest_ecg
+Se observa como algunas de las variables arrojan unos estadísticos sin sentido como en el caso de la variable sexo o rest_ecg, lo que indica que su formato puede que no sea el más apropiado para su representación y análisis.
 
 # 2 Integración y selección
 
-A continuación, se convierten los datos para que contengan un formato favorable a un posterior análisis.
+Como se ha comentado en el apartado anterior se deben realizar cambios en los formatos de algunas de las variables.
+A continuación, se muestran las conversiones de las variables para que contengan un formato favorable a un posterior análisis.
 
 ```{r}
 #Conversión de variables categóricas a factor
-df$sex <- as.factor(ifelse(df$sex == 0, "female", "male"))
+df$sex <- as.factor(ifelse(df$sex == 0, "Female", "Male"))
 df$exng <- as.factor(ifelse(df$exng == 0, "FALSE", "TRUE"))
 df$cp <- as.factor(df$cp)
 df$fbs <- as.factor(ifelse(df$fbs == 0, "FALSE", "TRUE"))
@@ -135,9 +138,12 @@ df$oldpeak <- as.numeric(df$oldpeak)
 df$slp <- as.numeric(df$slp)
 df$caa <- as.numeric(df$caa)
 df$thall <- as.numeric(df$thall)
-
 head(df)
 ```
+En primer lugar, se ha convertido la variable *sex* que era binaria a una categórica de dos niveles (Female/ Male). Las variables binarias *exng*,*fbs* y *output* se han convertido a categóricas de tipo TRUE/FALSE. Mientras que las variables *cp* y *restecg* cambian de tipo int a tipo factor sin modificación en los valores que pueden tomar.
+Por otro lado, las varibles de tipo int como *age*, *trtbps*, *chol*, *thalachh*, *oldpeak*, *slp*, *caa* y *thall* pasan a ser de tipo numérico.
+
+A continución, se vuelve a mostrar la tipología y el resumen estadístico de las variables del dataset después de su modificación.
 
 ```{r}
 str(df)
@@ -155,11 +161,13 @@ En el presente apartado se realizará una limpieza de los datos para determinar 
 
 ## 3.1 Gestión de elementos vacíos
 
+En primer lugar, se va a comprobar si existen variables que contengan algún registro vacío. Para ello se emplearán dos métodos concatenados. Por un lado, *is.na()* que indica si hay algún nulo y por otro *any()* que devuelve TRUE si hay algún resgitro como TRUE o FALSE en caso contrario. 
+
 ```{r}
 any(is.na(df))
 ```
 
-No existe ningún elemento vacío en el conjunto del dataset. Por otro lado, existen ceros, ya que algunas variables categóricas pueden contener como 0 una de sus categorías. Algunas de variables donde puede suceder esto son:
+Como se puede obervar, no existe ningún elemento vacío en el conjunto del dataset. Por otro lado, sí existen ceros, ya que algunas variables pueden tomar como valor el 0. Algunas de variables donde puede suceder esto son:
 
 -   cp
 
@@ -173,19 +181,118 @@ No existe ningún elemento vacío en el conjunto del dataset. Por otro lado, exi
 
 -   thall
 
-Todas ellas admiten el valor 0.
-
 ## 3.2 Tratamiento de outliers
 
+Para realizar el tratamiento de outliers en primer lugar se tienen que identificar. Para ello se va a hacer una representación de las variables. 
+Cabe destacar que las variables de tipo factor dado que son categóricas no puede darse este problema por lo que los outliers se estudiarán en aquellas variables de tipo numérico. 
+
+En primer lugar, se va a ver la distribución de las variables. Para ello se realizarán diagramas de tarta en el caso de las categóricas e histogramas en el caso de las numéricas.
+
 ```{r}
-mytable <- table(df$sex)
-lbls <- paste(names(mytable), "\n", mytable, sep="")
-pie(mytable, labels = lbls, main="Número de mujeres y hombres")
+table_sex <- table(df$sex)
+lbls_sex <- paste(names(table_sex), "\n", table_sex, sep="")
+table_cp <- table(df$cp)
+lbls_cp <- paste(names(table_cp), "\n", table_cp, sep="")
+table_fbs <- table(df$fbs)
+lbls_fbs <- paste(names(table_fbs), "\n", table_fbs, sep="")
+table_restecg <- table(df$restecg)
+lbls_restecg <- paste(names(table_restecg), "\n", table_restecg, sep="")
+table_exng <- table(df$exng)
+lbls_exng <- paste(names(table_exng), "\n", table_exng, sep="")
+table_output <- table(df$output)
+lbls_output <- paste(names(table_output), "\n", table_output, sep="")
+
+par(mfrow=c(3,2))
+pie(table_sex, labels = lbls_sex, main="Num. de mujeres y hombres")
+pie(table_cp, labels = lbls_cp, main="Num. pac.según dolor de pecho")
+pie(table_fbs, labels = lbls_fbs, main="Num. pac. con azúcar alto")
+pie(table_restecg, labels = lbls_restecg, main="Num. pac. según resultados ECG")
+pie(table_exng, labels = lbls_exng, main="Num. pac. con angina por ejercicio")
+pie(table_output, labels = lbls_output, main="Num. pac. con riesgo alto")
 ```
 
 ```{r}
+par(mfrow=c(4,1))
 hist(df$age, main="Histograma de edades", xlab="Edad (años)", ylab="Frecuencia")
+hist(df$trtbps, main="Histograma de presión arterial", xlab="Presión reposo (mm Hg)", ylab="Frecuencia")
+hist(df$chol, main="Histograma de colesterol", xlab="Colesterol (mg/dl)", ylab="Frecuencia")
+hist(df$thalachh, main="Histograma de frecuencia cardiaca", xlab="Frecuencia cardiaca", ylab="Frecuencia")
 ```
+```{r}
+par(mfrow=c(4,1))
+hist(df$oldpeak, main="Histograma de pico anterior", xlab="Pico anterior", ylab="Frecuencia")
+hist(df$slp, main="Histograma de Slope", xlab="Slope", ylab="Frecuencia")
+hist(df$caa, main="Histograma de arterias", xlab="Num. arterias principales", ylab="Frecuencia")
+hist(df$thall, main="Histograma de thall", xlab="Thall", ylab="Frecuencia")
+```
+
+Viendo los histogramas se puede ver como se distribuyen las variables pero para ver los valores extremos (outliers) se van a realizar los diagramas de cajas y bigotes **boxplot()**.
+
+```{r}
+par(mfrow=c(2,4))
+boxplot(df$age, main="Edad", ylab="Edad (años)")
+boxplot(df$trtbps, main="Presión arterial", ylab="Presión reposo (mm Hg)")
+boxplot(df$chol, main="Colesterol", ylab="Colesterol (mg/dl)")
+boxplot(df$thalachh, main="Frecuencia cardiaca máxima", ylab="Frecuencia cardiaca")
+boxplot(df$oldpeak, main="Pico anterior", ylab="Pico anterior")
+boxplot(df$slp, main="Slope", ylab="Slope")
+boxplot(df$caa, main="Arterias principales", ylab="Num. arterias principales")
+boxplot(df$thall, main="Thall", ylab="Thall")
+```
+A continuación, se va a analizar cada varaible:
+  - Edad: como se puede observar en la gráfica no se tiene ningún valor extremo.
+  - Presion arterial: se tienen varios pacientes cuya presión arterial está por encima del límite superior (170 mm Hg) por lo que se considerarían outliers.
+  - Colesterol: se puede ver que hay pacientes que están por encima del límite superior de 350 mg/dl por lo que también se considerarían outliers.
+  - Frecuencia cardiaca:se puede observa que hay un paciente que tiene la frecuencia cardiaca máxima por debajo de 90 que es el límite inferior. En este caso se          trataría de un outlier inferior.
+  - Pico anterior: en este caso se ve que hay outliers más altos al valor límite superior (4).
+  - Slope: en esta variable no se presentan valores extremos.
+  - Número de arterias principales: se ve que lo normal es que sean 2 o menos vasos sanguíneos afectados pero se pueden encontrar algunos registros en los que se da      que este valor es superior a 2.
+  - Thall: en este caso se observa que hay un caso en el que la variable toma un valor atípico con respecto al límite inferior lo que implica la presencia de un          outlier inferior.
+
+Para poder realizar un estudio que sea lo más preciso posible se han marcado todos aquellos datos que puedan influir de manera directa en la interpretación del resultado o en la aplicación de modelos de predicción, es por ello que se procede a marcar todos aquellos registros considerados como outliers para tenerlos identificados y realizar un estudio aparte si fuera necesario.
+
+```{r}
+out <- boxplot.stats(df$trtbps)$out
+out_trtbps <- which(df$trtbps %in% c(out))
+out_trtbps
+```
+```{r}
+out <- boxplot.stats(df$chol)$out
+out_chol <- which(df$chol %in% c(out))
+out_chol
+```
+```{r}
+out <- boxplot.stats(df$thalachh)$out
+out_thalachh <- which(df$thalachh %in% c(out))
+out_thalachh
+```
+```{r}
+out <- boxplot.stats(df$oldpeak)$out
+out_oldpeak <- which(df$oldpeak %in% c(out))
+out_oldpeak
+```
+```{r}
+out <- boxplot.stats(df$caa)$out
+out_caa <- which(df$caa %in% c(out))
+out_caa
+```
+```{r}
+out <- boxplot.stats(df$thall)$out
+out_thall <- which(df$thall %in% c(out))
+out_thall
+```
+```{r}
+out_pos <- sort(unique(c(out_trtbps, out_chol, out_thalachh, out_oldpeak, out_caa, out_thall)))
+out_pos
+```
+```{r}
+df[out_pos, "ind_out"] = 1
+df$ind_out[is.na(df$ind_out)] <- 0
+df$ind_out <- as.factor(df$ind_out)
+```
+
+El proceso anterior permite crear una variable más en el dataset que indica si el registro es un outlier debido a cualquiera de sus variables. 
+Se indica con 1 aquellos registro que se consideran outlier y con 0 los que no. Esto permitirá identificarlos de manera más sencilla a la hora de hacer el análisis.
 
 # 4 Análisis de datos 
 
