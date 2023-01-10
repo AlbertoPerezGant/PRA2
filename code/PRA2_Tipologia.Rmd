@@ -26,6 +26,10 @@ if (!require("lattice")) install.packages("lattice")
 library("lattice")
 if (!require("caret")) install.packages("caret") 
 library("caret")
+if (!require("ggplot2")) install.packages("ggplot2") 
+library(ggplot2)
+if (!require("GGally")) install.packages("GGally")
+library(GGally)
 ```
 
 # 1 Descripción del dataset
@@ -39,8 +43,7 @@ df <- read.csv("../dataset/heart.csv", stringsAsFactors = TRUE)
 head(df)
 ```
 
-Una vez se ha importado el dataset y almacenado en la variable que contiene los datos del ejercicio, se procede a su exploración. 
-En primer lugar, aunque se ha realizado una visualización de la cabecera del dataframe mediante el método **head()**, se examina que tipo de datos contiene con **str()**.
+Una vez se ha importado el dataset y almacenado en la variable que contiene los datos del ejercicio, se procede a su exploración. En primer lugar, aunque se ha realizado una visualización de la cabecera del dataframe mediante el método **head()**, se examina que tipo de datos contiene con **str()**.
 
 ```{r}
 str(df)
@@ -106,8 +109,7 @@ Las variables encontradas son:
 
     -   1= Mas riesgo de sufrir un ataque cardiaco
 
-Como se puede observar, la mayoría de las variables son de tipo numérico, por lo que será necesario convertirlas a un tipo de dato acorde al objetivo de la misma.
-Se emplea ahora la función **summary()** para hacer un resumen estadísitico de las variables del dataset.
+Como se puede observar, la mayoría de las variables son de tipo numérico, por lo que será necesario convertirlas a un tipo de dato acorde al objetivo de la misma. Se emplea ahora la función **summary()** para hacer un resumen estadísitico de las variables del dataset.
 
 ```{r}
 summary(df)
@@ -117,8 +119,7 @@ Se observa como algunas de las variables arrojan unos estadísticos sin sentido 
 
 # 2 Integración y selección
 
-Como se ha comentado en el apartado anterior se deben realizar cambios en los formatos de algunas de las variables.
-A continuación, se muestran las conversiones de las variables para que contengan un formato favorable a un posterior análisis.
+Como se ha comentado en el apartado anterior se deben realizar cambios en los formatos de algunas de las variables. A continuación, se muestran las conversiones de las variables para que contengan un formato favorable a un posterior análisis.
 
 ```{r}
 #Conversión de variables categóricas a factor
@@ -140,8 +141,8 @@ df$caa <- as.numeric(df$caa)
 df$thall <- as.numeric(df$thall)
 head(df)
 ```
-En primer lugar, se ha convertido la variable *sex* que era binaria a una categórica de dos niveles (Female/ Male). Las variables binarias *exng*,*fbs* y *output* se han convertido a categóricas de tipo TRUE/FALSE. Mientras que las variables *cp* y *restecg* cambian de tipo int a tipo factor sin modificación en los valores que pueden tomar.
-Por otro lado, las varibles de tipo int como *age*, *trtbps*, *chol*, *thalachh*, *oldpeak*, *slp*, *caa* y *thall* pasan a ser de tipo numérico.
+
+En primer lugar, se ha convertido la variable *sex* que era binaria a una categórica de dos niveles (Female/ Male). Las variables binarias *exng*,*fbs* y *output* se han convertido a categóricas de tipo TRUE/FALSE. Mientras que las variables *cp* y *restecg* cambian de tipo int a tipo factor sin modificación en los valores que pueden tomar. Por otro lado, las varibles de tipo int como *age*, *trtbps*, *chol*, *thalachh*, *oldpeak*, *slp*, *caa* y *thall* pasan a ser de tipo numérico.
 
 A continución, se vuelve a mostrar la tipología y el resumen estadístico de las variables del dataset después de su modificación.
 
@@ -155,13 +156,13 @@ summary(df)
 
 Al realizar un resumen posterior de las variables modificadas, se observa como aquellas que antes tenían un formato entero, se ha conseguido que ahora se pueda ofrecer un conteo sobre las que presentan características categóricas.
 
-# 3 Limpieza de datos 
+# 3 Limpieza de datos
 
 En el presente apartado se realizará una limpieza de los datos para determinar si existen elementos vacíos o valores anómalos.
 
 ## 3.1 Gestión de elementos vacíos
 
-En primer lugar, se va a comprobar si existen variables que contengan algún registro vacío. Para ello se emplearán dos métodos concatenados. Por un lado, *is.na()* que indica si hay algún nulo y por otro *any()* que devuelve TRUE si hay algún resgitro como TRUE o FALSE en caso contrario. 
+En primer lugar, se va a comprobar si existen variables que contengan algún registro vacío. Para ello se emplearán dos métodos concatenados. Por un lado, *is.na()* que indica si hay algún nulo y por otro *any()* que devuelve TRUE si hay algún resgitro como TRUE o FALSE en caso contrario.
 
 ```{r}
 any(is.na(df))
@@ -183,8 +184,7 @@ Como se puede obervar, no existe ningún elemento vacío en el conjunto del data
 
 ## 3.2 Tratamiento de outliers
 
-Para realizar el tratamiento de outliers en primer lugar se tienen que identificar. Para ello se va a hacer una representación de las variables. 
-Cabe destacar que las variables de tipo factor dado que son categóricas no puede darse este problema por lo que los outliers se estudiarán en aquellas variables de tipo numérico. 
+Para realizar el tratamiento de outliers en primer lugar se tienen que identificar. Para ello se va a hacer una representación de las variables. Cabe destacar que las variables de tipo factor dado que son categóricas no puede darse este problema por lo que los outliers se estudiarán en aquellas variables de tipo numérico.
 
 En primer lugar, se va a ver la distribución de las variables. Para ello se realizarán diagramas de tarta en el caso de las categóricas e histogramas en el caso de las numéricas.
 
@@ -210,7 +210,6 @@ pie(table_restecg, labels = lbls_restecg, main="Num. pac. según resultados ECG"
 legend("topleft", c("0","1","2"),fill =  color)
 ```
 
-
 ```{r}
 table_exng <- table(df$exng)
 lbls_exng <- paste(names(table_exng), "\n", table_exng, sep="")
@@ -230,6 +229,7 @@ hist(df$trtbps, main="Histograma de presión arterial", xlab="Presión reposo (m
 hist(df$chol, main="Histograma de colesterol", xlab="Colesterol (mg/dl)", ylab="Frecuencia")
 hist(df$thalachh, main="Histograma de frecuencia cardiaca", xlab="Frecuencia cardiaca", ylab="Frecuencia")
 ```
+
 ```{r}
 par(mfrow=c(2,2))
 hist(df$oldpeak, main="Histograma de pico anterior", xlab="Pico anterior", ylab="Frecuencia")
@@ -256,15 +256,24 @@ boxplot(df$slp, main="Slope", ylab="Slope")
 boxplot(df$caa, main="Arterias principales", ylab="Num. arterias principales")
 boxplot(df$thall, main="Thall", ylab="Thall")
 ```
+
 A continuación, se va a analizar cada varaible:
-  - Edad: como se puede observar en la gráfica no se tiene ningún valor extremo.
-  - Presion arterial: se tienen varios pacientes cuya presión arterial está por encima del límite superior (170 mm Hg) por lo que se considerarían outliers.
-  - Colesterol: se puede ver que hay pacientes que están por encima del límite superior de 350 mg/dl por lo que también se considerarían outliers.
-  - Frecuencia cardiaca:se puede observa que hay un paciente que tiene la frecuencia cardiaca máxima por debajo de 90 que es el límite inferior. En este caso se          trataría de un outlier inferior.
-  - Pico anterior: en este caso se ve que hay outliers más altos al valor límite superior (4).
-  - Slope: en esta variable no se presentan valores extremos.
-  - Número de arterias principales: se ve que lo normal es que sean 2 o menos vasos sanguíneos afectados pero se pueden encontrar algunos registros en los que se da      que este valor es superior a 2.
-  - Thall: en este caso se observa que hay un caso en el que la variable toma un valor atípico con respecto al límite inferior lo que implica la presencia de un          outlier inferior.
+
+-   Edad: como se puede observar en la gráfica no se tiene ningún valor extremo.
+
+-   Presion arterial: se tienen varios pacientes cuya presión arterial está por encima del límite superior (170 mm Hg) por lo que se considerarían outliers.
+
+-   Colesterol: se puede ver que hay pacientes que están por encima del límite superior de 350 mg/dl por lo que también se considerarían outliers.
+
+-   Frecuencia cardiaca:se puede observa que hay un paciente que tiene la frecuencia cardiaca máxima por debajo de 90 que es el límite inferior. En este caso se trataría de un outlier inferior.
+
+-   Pico anterior: en este caso se ve que hay outliers más altos al valor límite superior (4).
+
+-   Slope: en esta variable no se presentan valores extremos.
+
+-   Número de arterias principales: se ve que lo normal es que sean 2 o menos vasos sanguíneos afectados pero se pueden encontrar algunos registros en los que se da que este valor es superior a 2.
+
+-   Thall: en este caso se observa que hay un caso en el que la variable toma un valor atípico con respecto al límite inferior lo que implica la presencia de un outlier inferior.
 
 Para poder realizar un estudio que sea lo más preciso posible se han marcado todos aquellos datos que puedan influir de manera directa en la interpretación del resultado o en la aplicación de modelos de predicción, es por ello que se procede a marcar todos aquellos registros considerados como outliers para tenerlos identificados y realizar un estudio aparte si fuera necesario.
 
@@ -273,61 +282,146 @@ out <- boxplot.stats(df$trtbps)$out
 out_trtbps <- which(df$trtbps %in% c(out))
 out_trtbps
 ```
+
 ```{r}
 out <- boxplot.stats(df$chol)$out
 out_chol <- which(df$chol %in% c(out))
 out_chol
 ```
+
 ```{r}
 out <- boxplot.stats(df$thalachh)$out
 out_thalachh <- which(df$thalachh %in% c(out))
 out_thalachh
 ```
+
 ```{r}
 out <- boxplot.stats(df$oldpeak)$out
 out_oldpeak <- which(df$oldpeak %in% c(out))
 out_oldpeak
 ```
+
 ```{r}
 out <- boxplot.stats(df$caa)$out
 out_caa <- which(df$caa %in% c(out))
 out_caa
 ```
+
 ```{r}
 out <- boxplot.stats(df$thall)$out
 out_thall <- which(df$thall %in% c(out))
 out_thall
 ```
+
 ```{r}
 out_pos <- sort(unique(c(out_trtbps, out_chol, out_thalachh, out_oldpeak, out_caa, out_thall)))
 out_pos
 ```
+
 ```{r}
 df[out_pos, "ind_out"] = 1
 df$ind_out[is.na(df$ind_out)] <- 0
 df$ind_out <- as.factor(df$ind_out)
 ```
 
-El proceso anterior permite crear una variable más en el dataset que indica si el registro es un outlier debido a cualquiera de sus variables. 
-Se indica con 1 aquellos registro que se consideran outlier y con 0 los que no. Esto permitirá identificarlos de manera más sencilla a la hora de hacer el análisis.
+El proceso anterior permite crear una variable más en el dataset que indica si el registro es un outlier debido a cualquiera de sus variables. Se indica con 1 aquellos registro que se consideran outlier y con 0 los que no. Esto permitirá identificarlos de manera más sencilla a la hora de hacer el análisis.
 
-# 4 Análisis de datos 
+# 4 Análisis de datos
 
 ## 4.1 Selección de los grupos de datos que se quieren analizar y comparar
 
 Como se ha comentado en el apartado anterior se va a analizar el dataset completo, se han marcado todos aquellos registros que se consideran valores extremos en alguna de las variables de estudio y si fuera necesario tras analizar los resultados se eliminarán del conjunto, pero a priori parece que esos outliers pueden ser de utilidad tanto en el estudio y análisis como en la generación de modelos predictivos.
 
-
-
 ## 4.2 Comprobación de normalidad y homogeneidad de la varianza
 
-## 4.3 Aplicación de pruebas estadísticas  para comparar los grupos de datos
+A continuación, se emplea la prueba de normalidad de Anderson-Darling para las variables cuantitativas del dataset. Para ello, se considera un nivel de significación de 0.05.
+
+```{r}
+if (!require("nortest")) install.packages("nortest")
+library(nortest)
+
+alpha = 0.05
+col.names = colnames(df)
+
+for (i in 1:ncol(df)) {
+  
+  if (i == 1) cat("Variables que no siguen una distribución normal:\n")
+  
+  if (is.integer(df[,i]) | is.numeric(df[,i])) {
+    p_val = ad.test(df[,i])$p.value
+      
+    if (p_val < alpha) {
+      cat(col.names[i])
+      
+    # Format output
+    if (i < ncol(df) - 1) cat(", ")
+    if (i %% 3 == 0) cat("\n")
+    }
+  }
+}
+```
+
+Como se puede observar, las variables que no siguen una distribución normal con un nivel de significación de 0.05 son:
+
+-   age
+
+-   trtbps
+
+-   chol
+
+-   thalachh
+
+-   oldpeak
+
+-   slp
+
+-   caa
+
+-   thall
+
+Esto indica que ninguna de las variables presenta normalidad para un nivel de significacia de 0.05.
+
+Posteriormente, para estudiar la homogeneidad de varianzas, se aplica un test de Fligner-Killen. En este caso, se aplica de acuerdo a la edad y el colesterol de los pacientes. La hipótesis nula consiste en que ambas varianzas sean iguales.
+
+```{r}
+fligner.test(age ~ chol, data=df)
+```
+
+Dado que se obtiene un p-valor superior a 0.05, se puede afirmar que las varianzas de ambas variables son homogéneas.
+
+Además, también es interesante comprobar como ofectan otras variables frente a la edad como oldpeak.
+
+```{r}
+fligner.test(age ~ oldpeak, data=df)
+```
+
+Nuevamente, se observa como ambas varianzas son homogéneas.
+
+Otras variables que interesan comparar con la edad son trtbps y thalachh.
+
+```{r}
+fligner.test(age ~ trtbps, data=df)
+```
+
+```{r}
+fligner.test(age ~ thalachh, data=df)
+```
+
+Como se puede apreciar, todas las combinaciones analizadas son homogéneas.
+
+## 4.3 Aplicación de pruebas estadísticas para comparar los grupos de datos
+
+En este caso, estudiaremos cuales de las variables cuantitativas influyen más en unas sobre otras. Para ello emplearemos la matriz generada por ggpairs, donde se indica el valor de correlación entre las variables consideradas.
+
+```{r, warn=0}
+var = c("output", "age", "trtbps", "chol", "thalachh", "oldpeak")
+
+ggpairs(df, columns=var, aes(color=output)) + 
+  labs(title="Matriz de correlaciones y scatterplot de las variables")
+```
+
+Del anterior gráfico, se observa como no hay una gran correlación entre la mayoría de las varibales. No obstante, se observa como la edad es una de las que más relacoines contiene. Por otro lado, sobre la variable output, se observa como existe una media considerablemente mayor de personas con riesgo conforme aumenta el valor. Sucede lo mismo con el colesterol, la frecuencia máxima alcanzada (a la inversa) y oldpeak.
 
 # 5 Representación de los resultados
 
 # 6 Resolución del problema
-
-
-
-
-
