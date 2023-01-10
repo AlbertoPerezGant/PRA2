@@ -197,29 +197,41 @@ table_fbs <- table(df$fbs)
 lbls_fbs <- paste(names(table_fbs), "\n", table_fbs, sep="")
 table_restecg <- table(df$restecg)
 lbls_restecg <- paste(names(table_restecg), "\n", table_restecg, sep="")
+
+par(mfrow=c(2,2))
+color <- c("white","cadetblue1","darkseagreen1", "lightpink")
+pie(table_sex, labels = lbls_sex, main="Num. de mujeres y hombres", col = color)
+legend("topleft", c("Female","Male"),fill =  color)
+pie(table_cp, labels = lbls_cp, main="Num. pac.según dolor de pecho", col =color)
+legend("topleft", c("0","1","2","3"),fill =  color)
+pie(table_fbs, labels = lbls_fbs, main="Num. pac. con azúcar alto", col = color)
+legend("bottomleft", c("FALSE","TRUE"),fill =  color)
+pie(table_restecg, labels = lbls_restecg, main="Num. pac. según resultados ECG", col = color)
+legend("topleft", c("0","1","2"),fill =  color)
+```
+
+
+```{r}
 table_exng <- table(df$exng)
 lbls_exng <- paste(names(table_exng), "\n", table_exng, sep="")
 table_output <- table(df$output)
 lbls_output <- paste(names(table_output), "\n", table_output, sep="")
-
-par(mfrow=c(3,2))
-pie(table_sex, labels = lbls_sex, main="Num. de mujeres y hombres")
-pie(table_cp, labels = lbls_cp, main="Num. pac.según dolor de pecho")
-pie(table_fbs, labels = lbls_fbs, main="Num. pac. con azúcar alto")
-pie(table_restecg, labels = lbls_restecg, main="Num. pac. según resultados ECG")
-pie(table_exng, labels = lbls_exng, main="Num. pac. con angina por ejercicio")
-pie(table_output, labels = lbls_output, main="Num. pac. con riesgo alto")
+par(mfrow=c(1,2))
+pie(table_exng, labels = lbls_exng, main="Num. pac. con angina ejercicio", col = color)
+legend("bottomleft", c("FALSE","TRUE"),fill =  color)
+pie(table_output, labels = lbls_output, main="Num. pac. con riesgo alto",col = color)
+legend("topleft", c("FALSE","TRUE"),fill =  color)
 ```
 
 ```{r}
-par(mfrow=c(4,1))
+par(mfrow=c(2,2))
 hist(df$age, main="Histograma de edades", xlab="Edad (años)", ylab="Frecuencia")
 hist(df$trtbps, main="Histograma de presión arterial", xlab="Presión reposo (mm Hg)", ylab="Frecuencia")
 hist(df$chol, main="Histograma de colesterol", xlab="Colesterol (mg/dl)", ylab="Frecuencia")
 hist(df$thalachh, main="Histograma de frecuencia cardiaca", xlab="Frecuencia cardiaca", ylab="Frecuencia")
 ```
 ```{r}
-par(mfrow=c(4,1))
+par(mfrow=c(2,2))
 hist(df$oldpeak, main="Histograma de pico anterior", xlab="Pico anterior", ylab="Frecuencia")
 hist(df$slp, main="Histograma de Slope", xlab="Slope", ylab="Frecuencia")
 hist(df$caa, main="Histograma de arterias", xlab="Num. arterias principales", ylab="Frecuencia")
@@ -229,11 +241,16 @@ hist(df$thall, main="Histograma de thall", xlab="Thall", ylab="Frecuencia")
 Viendo los histogramas se puede ver como se distribuyen las variables pero para ver los valores extremos (outliers) se van a realizar los diagramas de cajas y bigotes **boxplot()**.
 
 ```{r}
-par(mfrow=c(2,4))
+par(mfrow=c(2,2))
 boxplot(df$age, main="Edad", ylab="Edad (años)")
 boxplot(df$trtbps, main="Presión arterial", ylab="Presión reposo (mm Hg)")
 boxplot(df$chol, main="Colesterol", ylab="Colesterol (mg/dl)")
 boxplot(df$thalachh, main="Frecuencia cardiaca máxima", ylab="Frecuencia cardiaca")
+
+```
+
+```{r}
+par(mfrow=c(2,2))
 boxplot(df$oldpeak, main="Pico anterior", ylab="Pico anterior")
 boxplot(df$slp, main="Slope", ylab="Slope")
 boxplot(df$caa, main="Arterias principales", ylab="Num. arterias principales")
@@ -298,6 +315,10 @@ Se indica con 1 aquellos registro que se consideran outlier y con 0 los que no. 
 
 ## 4.1 Selección de los grupos de datos que se quieren analizar y comparar
 
+Como se ha comentado en el apartado anterior se va a analizar el dataset completo, se han marcado todos aquellos registros que se consideran valores extremos en alguna de las variables de estudio y si fuera necesario tras analizar los resultados se eliminarán del conjunto, pero a priori parece que esos outliers pueden ser de utilidad tanto en el estudio y análisis como en la generación de modelos predictivos.
+
+
+
 ## 4.2 Comprobación de normalidad y homogeneidad de la varianza
 
 ## 4.3 Aplicación de pruebas estadísticas  para comparar los grupos de datos
@@ -305,3 +326,8 @@ Se indica con 1 aquellos registro que se consideran outlier y con 0 los que no. 
 # 5 Representación de los resultados
 
 # 6 Resolución del problema
+
+
+
+
+
