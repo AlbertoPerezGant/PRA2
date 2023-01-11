@@ -428,7 +428,7 @@ ggpairs(df, columns=var, aes(color=output)) +
   labs(title="Matriz de correlaciones y scatterplot de las variables")
 ```
 
-Esta gráfica no la deja exportarla a PDF, por lo que es necesaria la ejecución del .rmd. Del anterior gráfico, se observa como no hay una gran correlación entre la mayoría de las varibales. No obstante, se observa como la edad es una de las que más relaciones contiene. Por otro lado, sobre la variable output, se observa como existe una media considerablemente mayor de personas con riesgo conforme aumenta el valor. Sucede lo mismo con el colesterol, la frecuencia máxima alcanzada (a la inversa) y oldpeak.
+ Del anterior gráfico, se observa como no hay una gran correlación entre la mayoría de las varibales. No obstante, se observa como la edad es una de las que más relaciones contiene. Por otro lado, sobre la variable output, se observa como existe una media considerablemente mayor de personas con riesgo conforme aumenta el valor. Sucede lo mismo con el colesterol, la frecuencia máxima alcanzada (a la inversa) y oldpeak.
 
 ### Contraste de hipótesis
 
