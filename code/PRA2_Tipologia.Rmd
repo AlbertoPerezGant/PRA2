@@ -1,5 +1,5 @@
 ---
-title: "PRA-2"
+title: "Tipología y ciclo de vida de los datos - PRA-2"
 author: "Alberto Perez Gant y Patricia García Menendez"
 date: '`r format(Sys.Date(),"%e de %B, %Y")`'
 output:
@@ -25,7 +25,7 @@ library("knitr")
 if (!require("lattice")) install.packages("lattice") 
 library("lattice")
 if (!require("caret")) install.packages("caret") 
-library("caret")
+##library("caret")
 if (!require("ggplot2")) install.packages("ggplot2") 
 library(ggplot2)
 if (!require("GGally")) install.packages("GGally")
@@ -139,6 +139,7 @@ df$oldpeak <- as.numeric(df$oldpeak)
 df$slp <- as.numeric(df$slp)
 df$caa <- as.numeric(df$caa)
 df$thall <- as.numeric(df$thall)
+df$output_num <- as.numeric(ifelse(df$output == "FALSE", 0,1)) 
 head(df)
 ```
 
@@ -202,11 +203,12 @@ par(mfrow=c(2,2))
 color <- c("white","cadetblue1","darkseagreen1", "lightpink")
 pie(table_sex, labels = lbls_sex, main="Num. de mujeres y hombres", col = color)
 legend("topleft", c("Female","Male"),fill =  color)
-pie(table_cp, labels = lbls_cp, main="Num. pac.según dolor de pecho", col =color)
+pie(table_cp, labels = lbls_cp, main="Num. pac.según dolor de pecho",col =color)
 legend("topleft", c("0","1","2","3"),fill =  color)
 pie(table_fbs, labels = lbls_fbs, main="Num. pac. con azúcar alto", col = color)
 legend("bottomleft", c("FALSE","TRUE"),fill =  color)
-pie(table_restecg, labels = lbls_restecg, main="Num. pac. según resultados ECG", col = color)
+pie(table_restecg, labels = lbls_restecg, main="Num. pac. según resultados ECG",
+    col = color)
 legend("topleft", c("0","1","2"),fill =  color)
 ```
 
@@ -216,25 +218,32 @@ lbls_exng <- paste(names(table_exng), "\n", table_exng, sep="")
 table_output <- table(df$output)
 lbls_output <- paste(names(table_output), "\n", table_output, sep="")
 par(mfrow=c(1,2))
-pie(table_exng, labels = lbls_exng, main="Num. pac. con angina ejercicio", col = color)
+pie(table_exng, labels = lbls_exng, main="Num. pac. con angina ejercicio", 
+    col = color)
 legend("bottomleft", c("FALSE","TRUE"),fill =  color)
-pie(table_output, labels = lbls_output, main="Num. pac. con riesgo alto",col = color)
+pie(table_output, labels = lbls_output, main="Num. pac. con riesgo alto",
+    col = color)
 legend("topleft", c("FALSE","TRUE"),fill =  color)
 ```
 
 ```{r}
 par(mfrow=c(2,2))
 hist(df$age, main="Histograma de edades", xlab="Edad (años)", ylab="Frecuencia")
-hist(df$trtbps, main="Histograma de presión arterial", xlab="Presión reposo (mm Hg)", ylab="Frecuencia")
-hist(df$chol, main="Histograma de colesterol", xlab="Colesterol (mg/dl)", ylab="Frecuencia")
-hist(df$thalachh, main="Histograma de frecuencia cardiaca", xlab="Frecuencia cardiaca", ylab="Frecuencia")
+hist(df$trtbps, main="Histograma de presión arterial", 
+     xlab="Presión reposo (mm Hg)", ylab="Frecuencia")
+hist(df$chol, main="Histograma de colesterol", 
+     xlab="Colesterol (mg/dl)", ylab="Frecuencia")
+hist(df$thalachh, main="Histograma de frecuencia cardiaca", 
+     xlab="Frecuencia cardiaca", ylab="Frecuencia")
 ```
 
 ```{r}
 par(mfrow=c(2,2))
-hist(df$oldpeak, main="Histograma de pico anterior", xlab="Pico anterior", ylab="Frecuencia")
+hist(df$oldpeak, main="Histograma de pico anterior", xlab="Pico anterior",
+     ylab="Frecuencia")
 hist(df$slp, main="Histograma de Slope", xlab="Slope", ylab="Frecuencia")
-hist(df$caa, main="Histograma de arterias", xlab="Num. arterias principales", ylab="Frecuencia")
+hist(df$caa, main="Histograma de arterias", xlab="Num. arterias principales", 
+     ylab="Frecuencia")
 hist(df$thall, main="Histograma de thall", xlab="Thall", ylab="Frecuencia")
 ```
 
@@ -245,8 +254,8 @@ par(mfrow=c(2,2))
 boxplot(df$age, main="Edad", ylab="Edad (años)")
 boxplot(df$trtbps, main="Presión arterial", ylab="Presión reposo (mm Hg)")
 boxplot(df$chol, main="Colesterol", ylab="Colesterol (mg/dl)")
-boxplot(df$thalachh, main="Frecuencia cardiaca máxima", ylab="Frecuencia cardiaca")
-
+boxplot(df$thalachh, main="Frecuencia cardiaca máxima", 
+        ylab="Frecuencia cardiaca")
 ```
 
 ```{r}
@@ -260,19 +269,12 @@ boxplot(df$thall, main="Thall", ylab="Thall")
 A continuación, se va a analizar cada varaible:
 
 -   Edad: como se puede observar en la gráfica no se tiene ningún valor extremo.
-
 -   Presion arterial: se tienen varios pacientes cuya presión arterial está por encima del límite superior (170 mm Hg) por lo que se considerarían outliers.
-
 -   Colesterol: se puede ver que hay pacientes que están por encima del límite superior de 350 mg/dl por lo que también se considerarían outliers.
-
 -   Frecuencia cardiaca:se puede observa que hay un paciente que tiene la frecuencia cardiaca máxima por debajo de 90 que es el límite inferior. En este caso se trataría de un outlier inferior.
-
 -   Pico anterior: en este caso se ve que hay outliers más altos al valor límite superior (4).
-
 -   Slope: en esta variable no se presentan valores extremos.
-
 -   Número de arterias principales: se ve que lo normal es que sean 2 o menos vasos sanguíneos afectados pero se pueden encontrar algunos registros en los que se da que este valor es superior a 2.
-
 -   Thall: en este caso se observa que hay un caso en el que la variable toma un valor atípico con respecto al límite inferior lo que implica la presencia de un outlier inferior.
 
 Para poder realizar un estudio que sea lo más preciso posible se han marcado todos aquellos datos que puedan influir de manera directa en la interpretación del resultado o en la aplicación de modelos de predicción, es por ello que se procede a marcar todos aquellos registros considerados como outliers para tenerlos identificados y realizar un estudio aparte si fuera necesario.
@@ -314,7 +316,8 @@ out_thall
 ```
 
 ```{r}
-out_pos <- sort(unique(c(out_trtbps, out_chol, out_thalachh, out_oldpeak, out_caa, out_thall)))
+out_pos <- sort(unique(c(out_trtbps, out_chol, out_thalachh, out_oldpeak, 
+                         out_caa, out_thall)))
 out_pos
 ```
 
@@ -364,19 +367,12 @@ for (i in 1:ncol(df)) {
 Como se puede observar, las variables que no siguen una distribución normal con un nivel de significación de 0.05 son:
 
 -   age
-
 -   trtbps
-
 -   chol
-
 -   thalachh
-
 -   oldpeak
-
 -   slp
-
 -   caa
-
 -   thall
 
 Esto indica que ninguna de las variables presenta normalidad para un nivel de significacia de 0.05.
@@ -411,17 +407,135 @@ Como se puede apreciar, todas las combinaciones analizadas son homogéneas.
 
 ## 4.3 Aplicación de pruebas estadísticas para comparar los grupos de datos
 
+### Cálculo y análisis de correlaciones entre variables:
+
+En primer lugar se va a comprobar la correlación que hay entre las variables del dataset. Para ello, se genera la matriz de correlaciones para todas las variables numéricas.
+
+```{r}
+df_num <- df[c("age", "trtbps", "chol", "thalachh", "oldpeak", "slp", "caa",
+               "thall", "output_num")]
+correlaciones <- round(cor(df_num),2)
+correlaciones
+```
+
+Como se puede observar en la matriz anterior no existe mucha correlación entre las variables. Se puede observar que las variables que más correlación tienen con **output_num** son **thalachh** y **oldpeak**
+
 En este caso, estudiaremos cuales de las variables cuantitativas influyen más en unas sobre otras. Para ello emplearemos la matriz generada por ggpairs, donde se indica el valor de correlación entre las variables consideradas.
 
 ```{r, warn=0}
 var = c("output", "age", "trtbps", "chol", "thalachh", "oldpeak")
-
 ggpairs(df, columns=var, aes(color=output)) + 
   labs(title="Matriz de correlaciones y scatterplot de las variables")
 ```
 
-Del anterior gráfico, se observa como no hay una gran correlación entre la mayoría de las varibales. No obstante, se observa como la edad es una de las que más relacoines contiene. Por otro lado, sobre la variable output, se observa como existe una media considerablemente mayor de personas con riesgo conforme aumenta el valor. Sucede lo mismo con el colesterol, la frecuencia máxima alcanzada (a la inversa) y oldpeak.
+Esta gráfica no la deja exportarla a PDF, por lo que es necesaria la ejecución del .rmd. Del anterior gráfico, se observa como no hay una gran correlación entre la mayoría de las varibales. No obstante, se observa como la edad es una de las que más relaciones contiene. Por otro lado, sobre la variable output, se observa como existe una media considerablemente mayor de personas con riesgo conforme aumenta el valor. Sucede lo mismo con el colesterol, la frecuencia máxima alcanzada (a la inversa) y oldpeak.
 
-# 5 Representación de los resultados
+### Contraste de hipótesis
 
-# 6 Resolución del problema
+Se va a realizar ahora un contraste de hipótesis sobre las muestras del dataset para determinar si el sexo y el nivel de azúcar en sangre influyen en el riesgo de sufrir un ataque al corazón.
+
+Se empieza analizando la variable **sex**, para ello se generan dos muestras una para el sexo femenino y otra para el masculino:
+
+```{r}
+df_female <- df[df$sex == "Female",]$output_num
+df_male <- df[df$sex == "Male",]$output_num
+```
+
+Tomando $\alpha$ = 0.05, se plantean las siguientes hipótesis:
+
+      - H0: Los hombres tienen mayor número de ataques cardíacos que las mujeres.
+      - H1: Los hombres tienen menor número de ataques cardíacos que las mujeres.
+
+```{r}
+t.test(df_female,df_male, alternative = "less")
+```
+
+Como se puede observar el p-value está por encima de 0.05 por lo que se acepta la hipótesis nula lo que indica que los hombres tienen mayor número de ataques cardíacos que las mujeres con un nivel de confianza del 95% en el intervalo de confianza.
+
+Se va a analizar ahora el nivel de azúcar en sangre. Para ello se analiza la variable **fbs**, para ello se genera como en el caso anterior dos grupos uno con el azúcar por encima de 120 mg/dl y otro con los que están por debajo:
+
+```{r}
+df_fbs_true <- df[df$fbs == "TRUE",]$output_num
+df_fbs_false <- df[df$fbs == "FALSE",]$output_num
+```
+
+Tomando $\alpha$ = 0.05, se plantean las siguientes hipótesis:
+
+      - H0: Los pacientes con mayor azúcar tienen mayor número de ataques cardíacos.
+      - H1: Los paciente con mayor azúcar no tienen mayor número de ataques cardíacos.
+
+```{r}
+t.test(df_fbs_true,df_fbs_false)
+```
+
+Como se puede observar, en este caso, el p-value también está por encima de 0.05 por lo que se acepta la hipótesis nula, lo que dice que los pacientes con azúcar por encima de los 120 mg/dl tienen mayor número de ataques cardíacos que los que tienen el azúcar en sangre más bajo con un nivel de confianza del 95%.
+
+### Modelo de regresión lineal:
+
+Tras realizar el estudio de las correlaciones y los contrastes de hipótesis se va ahora a realizar un modelo de regresió lineal con el objetivo de predecir si el paciente en cuestión tiene o no riesgo de sufrir un ataque cardíaco. Para ello se va a generan varios modelos en función de la matriz de correlación obtenida en uno de los apartados anteriores.
+
+Se seleccionan los regresores cuantitativos con mayor coeficiente de correlación con respecto a la variable *output*, los regresores cualitativos y la variable a predecir:
+
+```{r}
+# Regresores cuantitativos:
+edad <- df$age
+presion <- df$trtbps
+colesterol <- df$chol
+frec_cardiaca <- df$thalachh
+pico <- df$oldpeak
+slope <- df$slp
+arterias <- df$caa
+thall <- df$thall
+
+# Regresores cualitativos.
+sexo <- df$sex
+cp <- df$cp
+azucar <- df$fbs
+res_ECG <- df$restecg
+angina <- df$exng
+
+#Variable a predecir:
+target <- df$output_num
+```
+
+Se generan los modelos a partir de los regresores seleccionados:
+
+```{r}
+# Modelo 1 con todas las variables:
+modelo1 <- lm(target ~ edad +  colesterol + frec_cardiaca + pico + slope +
+                arterias + thall + sexo + cp + azucar + res_ECG + angina, 
+              data = df)
+# Modelo 2:
+modelo2 <- lm(target ~ edad +  frec_cardiaca +  pico , data = df)
+
+# Modelo 3:
+modelo3 <- lm(target ~ edad +   frec_cardiaca + pico +  sexo + cp + azucar 
+              + res_ECG , data = df)
+
+res_modelos <- matrix(c("Modelo 1", summary(modelo1)$r.squared,
+                        "Modelo 2",summary(modelo2)$r.squared,
+                        "Modelo 3", summary(modelo3)$r.squared), 
+                      ncol = 2, byrow = TRUE)
+res_modelos
+```
+
+Como se puede ver los mejores resultados de predicción mediante los modelos de regresión se dan cuando se combinan todas las variables, aún así puede verse que el valor de R-squared es bastante bajo, esto puede deberse a la tipología del dataset, dado que es un problema más de clasificación que de regresión y por lo tanto se obtendrían mejores resultados aplicando modelos de clasificación como pueden ser KNN, árboles de decisión o clusters.
+
+# 5 Resolución del problema
+
+Como se ha ido explicando en la resolución de la práctica,el dataset recoge información sobre pacientes. Con la información obtenida se pretende dar respuesta a si un paciente tiene riesgo o no de sufrir un ataque cardíaco. Para ello se cuenta con información de la edad, sexo, presión sanguínea, frecuencia cardiaca... y también con la variable que se busca predecir,la cual indica si dicho paciente ha sufrido o no un ataque cardíaco. El dataset propuesto responde de manera bastante buena a la resolución del problema mediante los métodos utilizados, cabe destacar aún así que los resultados son bastante mejorables dado que se obtiene un R-squared de 0.52. Estos resultados podrían mejorar, como ya se ha comentado, aplicando algoritmos de clasificación en lugar de los de regresión o incluso la regresión logística.
+
+## Enlaces
+
+Enlace al vídeo: <https://drive.google.com/file/d/1lojUL9lUEX4xb_mV3VXn4ea7JiPgdZpF/view?usp=share_link>
+
+Enlace al repositorio de Github: <https://github.com/AlbertoPerezGant/PRA2.git>
+
+## Tabla de contribuciones:
+
+|       Contribuciones        |             Firma              |
+|:---------------------------:|:------------------------------:|
+|    Investigación previa     | Alberto Pérez, Patricia García |
+| Redacción de las respuestas | Alberto Pérez, Patricia García |
+|    Desarrollo del código    | Alberto Pérez, Patricia García |
+|  Participación en el vídeo  | Alberto Pérez, Patricia García |
